@@ -1,5 +1,3 @@
-import qs from "qs";
-
 addEventListener("fetch", (event) => {
   event.respondWith(handleRequest(event.request));
 });
