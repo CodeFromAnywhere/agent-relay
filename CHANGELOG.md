@@ -71,27 +71,8 @@ Fix these node compatibility issues of cloudflare
 
 ✅ Do the same for all other things Twilio serves, basically creating a Twilio+GPT Link.
 
-# Allow for any attachments
-
-Now we are relying on gpt4 to process just the images which is useful as it is much more integrated and will be in the future, but what about processing of all kinds of stuff? An AI can do this in many ways and that is why we need cool tools.
-
-Let's do it like this:
-
-- provide `attachmentUrls` as text in an additional message, but provide some additional context for each file
-- tools provided can use these URLs & context as parameters.
-
-This way we can make our own multimodal LLM with extra functionalities that depend on the usecase. This keeps the model super general purpose.
-
-A good start would be to create an agent that allows for image generation, speech generation, and speech analsysis. Perfect for whatsapp!
-
 # Self Control
 
 Adding tools to call someone or to hang up the call are super cool for twilio calls. Let's try this out!
 
 In `/message` a tool that would change the tools to another agent would also be super interesting.
-
-# Apply for grant
-
-https://www.ngi.eu/opencalls/#ngizerocommonsfund3rd
-
-apply with ai!
