@@ -13,7 +13,16 @@ export const handleStsClient = async (request: Request) => {
   const deepgramToken = url.searchParams.get("deepgramToken");
 
   if (!agentUrl || !adminAuthToken || !deepgramToken) {
-    return new Response(`Please provide the right parameters`);
+    const html = await fetch(
+      "https://raw.githubusercontent.com/CodeFromAnywhere/agent-relay/main/src/index.html",
+      { method: "GET" },
+    ).then((x) => x.text());
+
+    return new Response(html, {
+      headers: {
+        "content-type": "text/html;charset=UTF-8",
+      },
+    });
   }
 
   const fullUrl = `https://${agentUrl}`;

@@ -5,6 +5,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webhook URL Generator</title>
+
+    <script>
+        window.onload = function () {
+            document.getElementById('domain').value = window.location.hostname;
+        };
+    </script>
 </head>
 
 <body>
@@ -23,6 +29,7 @@
     <p>Browser-based STS: <span id="browserBasedSts"></span></p>
 
     <script>
+
 
         function updateWebhooks() {
             const domain = document.getElementById('domain').value;

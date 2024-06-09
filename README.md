@@ -2,9 +2,9 @@
 
 Agent Relay can make an agent made via [ActionSchema Agents](https://agent.actionschema.com) available everywhere.
 
-# Webhooks
+# Usage
 
-Calculate your webhooks using [this tool](src/index.html)
+Calculate your webhooks [here](https://agent-relay.actionschema.workers.dev)
 
 # Twilio STS Agent
 
