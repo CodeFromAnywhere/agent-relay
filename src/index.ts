@@ -1,19 +1,49 @@
+import { getOperations } from "openapi-util/build/node/getOperations";
+import { resolveSchemaRecursive } from "openapi-util/build/resolveSchemaRecursive";
+import {
+  OpenapiDocument,
+  fetchOpenapi,
+  getFormContextFromOpenapi,
+  getOperationRequestInit,
+} from "openapi-util";
+import { handleTwilioMessage } from "./handleTwilioMessage";
+import { handleSendgridMessage } from "./sendgrid/handleSendgridMessage";
+
 addEventListener("fetch", (event) => {
   event.respondWith(handleRequest(event.request));
 });
 
 const agentWsUrl = "wss://sts.sandbox.deepgram.com/agent";
 
-type AssistantType = { instructions: string };
+type AssistantType = {
+  instructions: string;
+  openapiUrl?: string;
+  /** @description Used to authenticate to the OpenAPI to use tools */
+  openapiAuthToken?: string;
+};
 
 async function handleRequest(request: Request) {
   const url = new URL(request.url);
-  url.search;
+  const firstChunk = url.pathname.split("/")?.[1];
 
-  const deepgramToken = url.searchParams.get("deepgramToken");
-  const agentUrl = url.searchParams.get("agentUrl");
+  if (firstChunk === "twilio") {
+    // twilio handler
+    return handleTwilioMessage(request);
+  }
 
-  if (!deepgramToken || !agentUrl) {
+  if (firstChunk === "sendgrid") {
+    // sendgrid handler
+    return handleSendgridMessage(request);
+  }
+
+  // NB: needed to use this syntax because XML uses & for something else and we can't put it in the XML without changing things.
+  const [_, adminAuthToken, deepgramToken, ...agentUrlChunks] =
+    url.pathname.split("/");
+  const agentUrl = agentUrlChunks.join("/");
+
+  console.log("OKOK", { adminAuthToken, deepgramToken, agentUrl });
+
+  if (!adminAuthToken || !agentUrl || !deepgramToken) {
     return new Response(
       `<?xml version="1.0" encoding="UTF-8"?>
           <Response>
@@ -23,12 +53,19 @@ async function handleRequest(request: Request) {
     );
   }
 
-  const assistant = await fetch(agentUrl, {
-    method: "GET",
-    headers: { accept: "application/json" },
+  const fullUrl = `https://${agentUrl}`;
+  const assistant = await fetch(fullUrl, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${adminAuthToken}`,
+    },
   }).then((res) => res.json() as Promise<AssistantType>);
 
-  if (!assistant) {
+  if (
+    !assistant ||
+    Object.getOwnPropertyNames(assistant).includes("isSuccessful")
+  ) {
     return new Response(
       `<?xml version="1.0" encoding="UTF-8"?>
           <Response>
@@ -43,24 +80,74 @@ async function handleRequest(request: Request) {
     // TODO: Allow it to also record stuff in realtime
     return new Response(
       `<?xml version="1.0" encoding="UTF-8"?>
-          <Response>
-              <Connect>
-                  <Stream url="wss://${url.host}" />
-              </Connect>
-              <Say>Stream has ended. Goodbye!</Say>
-          </Response>`,
+<Response>
+    <Connect>
+        <Stream url="wss://${url.host}/${adminAuthToken}/${deepgramToken}/${agentUrl}" />
+    </Connect>
+    <Say>Conversation has ended. Goodbye!</Say>
+</Response>`,
       {
         headers: { "content-type": "text/xml" },
       },
     );
   }
 
+  console.log("We're a websocket!");
+
   const webSocketPair = new WebSocketPair();
   const [client, server] = Object.values(webSocketPair);
 
-  const agentSlug = url.pathname.slice(1);
+  //The 'credentials' field on 'RequestInitializerDict' is not implemented. <-- TODO: do something else that is supported by cloudflare
+  // const openapi = assistant.openapiUrl
+  //   ? ((await resolveSchemaRecursive({
+  //       documentUri: assistant.openapiUrl,
+  //       shouldDereference: true,
+  //     })) as OpenapiDocument | undefined)
+  //   : undefined;
+  const openapi = await fetchOpenapi(assistant.openapiUrl);
+  const operations = openapi ? await getOperations(openapi) : undefined;
 
-  handleWebSocketSession(server, { agentSlug, deepgramToken, assistant });
+  const functions =
+    openapi && operations
+      ? operations.map((item) => {
+          const { method, path } = item;
+
+          const formContext = getFormContextFromOpenapi({
+            //@ts-ignore
+            method,
+            path,
+            openapi,
+          });
+          const { parameters, schema, securitySchemes, servers } = formContext;
+
+          const { fetchRequestInit, url } = getOperationRequestInit({
+            path,
+            method,
+            //@ts-ignore
+            servers,
+            data: {},
+            parameters,
+            securitySchemes,
+          });
+
+          return {
+            name: item.id, // e.g. get_weather
+
+            // url string, the API endpoint where your function exists
+            // NB: as this can be based on the data (and parameters) we might have a problem with some openapis
+            api_endpoint: url,
+            description: item.operation.description || item.operation.summary,
+            input_schema: item.resolvedRequestBodySchema,
+
+            // Bearer token for provided api endpoint so we can auth to your function
+            api_secret: `Bearer ${assistant.openapiAuthToken}`,
+          };
+        })
+      : undefined;
+
+  console.log({ functions });
+
+  handleWebSocketSession(server, { assistant, deepgramToken, functions });
 
   return new Response(null, {
     status: 101,
@@ -68,16 +155,17 @@ async function handleRequest(request: Request) {
   });
 }
 
-function handleWebSocketSession(
+async function handleWebSocketSession(
   webSocket: WebSocket,
   context: {
-    agentSlug: string;
-    deepgramToken: string;
     assistant: AssistantType;
+    deepgramToken: string;
+    functions: any[] | undefined;
   },
 ) {
-  const { agentSlug, deepgramToken, assistant } = context;
   webSocket.accept();
+
+  const { assistant, functions, deepgramToken } = context;
 
   const configMessage = {
     type: "SettingsConfiguration",
@@ -101,44 +189,16 @@ function handleWebSocketSession(
         provider: "open_ai",
         model: "gpt-4o",
         instructions: assistant.instructions,
-
-        //        "You are a helpful voice assistant. You cannot perform actions, but you have expert knowledge. Please be as concise as possible.",
-        functions: [
-          /*
-
-          TODO: map an openapi to this format (not that hard) and see if it works.
-
-          A starting point would be an api to be able to send an SMS, Email, or WhatsApp message to the caller.
-
-          Another one would be to allow it to search via perplexity.
-
-          {
-          "name": "",// e.g. get_weather
-          "api_endpoint": "", // url string, the API endpoint where your function exists
-          "api_secret": "", // bearer token for provided api endpoint so we can auth to your function
-          "description": "", // e.g Get the current weather in a given location
-          "input_schema": {
-            "type": "", // e.g. object
-            "properties": {
-              "location": {
-                "type": "", // e.g. string
-                "description": "" // e.g. The city and state, e.g. San Francisco, CA
-              }
-            }
-          },
-          "required": [""] //required properties in above defined function  e.g. location 
-        }
-        */
-        ],
+        // functions,
       },
       speak: {
         model: "aura-asteria-en",
       },
       context: {
-        messages: [
-          // optional, llm message thread to pick back up existing conversation (e.g if websocket connection breaks), coming soon
-          // TODO: It would be great if the messages here can be a summary of all kinds of things that we know about the user through past conversations. But this stuff should probably be made available through some sort of endpoint, as this is intended to be a universal api.
-        ],
+        // messages: [
+        // optional, llm message thread to pick back up existing conversation (e.g if websocket connection breaks), coming soon
+        // TODO: It would be great if the messages here can be a summary of all kinds of things that we know about the user through past conversations. But this stuff should probably be made available through some sort of endpoint, as this is intended to be a universal api.
+        // ],
       },
     },
   };
@@ -187,7 +247,7 @@ function handleWebSocketSession(
       const data = JSON.parse(event.data as string);
       if (data.event === "start") {
         const start = data.start;
-        console.log("got our streamsid", streamSid);
+        console.log("got our streamsid", start.streamSid);
         streamSid = start.streamSid;
       }
       if (data.event === "connected") {

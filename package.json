@@ -3,13 +3,20 @@
   "version": "0.0.0",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240524.0",
+    "@types/vcf": "^2.0.7",
     "typescript": "^5.4.5",
+    "vcf": "^2.1.2",
     "wrangler": "3.57.2"
   },
   "private": true,
   "scripts": {
-    "start": "wrangler dev",
-    "deploy": "wrangler deploy"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "serve": "ngrok http http://localhost:8787"
   },
-  "dependencies": {}
+  "dependencies": {
+    "html-to-md": "^0.8.5",
+    "openapi-util": "0.0.57",
+    "twilio": "^5.1.1"
+  }
 }

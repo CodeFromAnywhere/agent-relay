@@ -13,9 +13,9 @@ cd twilio-sts-agent
 wrangler deploy
 ```
 
-Take the resulting `*.workers.dev` URL
+Take the resulting `*.workers.dev` URL and add the required path as follows. It should become something like this: `https://your-app-name.your-username.workers.dev/AUTH_HEADER/DEEPGRAM_TOKEN/AGENT_URL_WITHOUT_PROTOCOL`
 
-Add `?deepgramToken=xxx&agentUrl=xxx` to the url, and add that as a webhook URL of your twilio phone number.
+Make that url, and add that as a webhook URL of your twilio phone number.
 
 Done!
 
