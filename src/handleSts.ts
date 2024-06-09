@@ -115,15 +115,15 @@ export const handleSts = async (request: Request) => {
 
           return {
             name: item.id, // e.g. get_weather
+            description: item.operation.description || item.operation.summary,
 
             // url string, the API endpoint where your function exists
             // NB: as this can be based on the data (and parameters) we might have a problem with some openapis
-            api_endpoint: url,
-            description: item.operation.description || item.operation.summary,
-            input_schema: item.resolvedRequestBodySchema,
+            url,
+            parameters: item.resolvedRequestBodySchema,
 
             // Bearer token for provided api endpoint so we can auth to your function
-            api_secret: `Bearer ${assistant.openapiAuthToken}`,
+            key: `Bearer ${assistant.openapiAuthToken}`,
           };
         })
       : undefined;
