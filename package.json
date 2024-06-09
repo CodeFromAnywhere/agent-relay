@@ -1,5 +1,5 @@
 {
-  "name": "deepgram-agent",
+  "name": "agent-relay",
   "version": "0.0.0",
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240524.0",
