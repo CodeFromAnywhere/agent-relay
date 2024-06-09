@@ -57,7 +57,7 @@ export const handleSts = async (request: Request) => {
       `<?xml version="1.0" encoding="UTF-8"?>
   <Response>
       <Connect>
-          <Stream url="wss://${url.host}/${adminAuthToken}/${deepgramToken}/${agentUrl}" />
+          <Stream url="wss://${url.host}/sts/${adminAuthToken}/${deepgramToken}/${agentUrl}" />
       </Connect>
       <Say>Conversation has ended. Goodbye!</Say>
   </Response>`,
@@ -113,7 +113,7 @@ export const handleSts = async (request: Request) => {
             // NB: as this can be based on the data (and parameters) we might have a problem with some openapis
             url,
             parameters: item.resolvedRequestBodySchema,
-
+            method: "post",
             // Bearer token for provided api endpoint so we can auth to your function
             key: `Bearer ${assistant.openapiAuthToken}`,
           };
@@ -178,6 +178,8 @@ async function handleWebSocketSession(
     },
   };
 
+  console.log({ configMessage });
+
   const audioQueue: any[] = [];
   let streamSid: undefined | string = undefined;
 
@@ -191,6 +193,10 @@ async function handleWebSocketSession(
     stsWs = connectToSts();
     stsWs.addEventListener("open", () => {
       stsWs?.send(JSON.stringify(configMessage));
+    });
+
+    stsWs.addEventListener("error", async (event) => {
+      console.log("error event", event.message);
     });
 
     stsWs.addEventListener("message", async (event) => {
