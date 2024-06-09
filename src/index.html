@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webhook URL Generator</title>
+</head>
+
+<body>
+    <input id="domain" type="text" placeholder="domain" oninput="updateWebhooks()" />
+    <input id="agentUrl" type="text" placeholder="agentUrl" oninput="updateWebhooks()" />
+    <input id="adminAuthToken" type="text" placeholder="adminAuthToken" oninput="updateWebhooks()" />
+    <input id="deepgramToken" type="text" placeholder="deepgramToken" oninput="updateWebhooks()" />
+    <input id="twilioAccountSid" type="text" placeholder="twilioAccountSid" oninput="updateWebhooks()" />
+    <input id="twilioAuthToken" type="text" placeholder="twilioAuthToken" oninput="updateWebhooks()" />
+    <input id="sendgridApiKey" type="text" placeholder="sendgridApiKey" oninput="updateWebhooks()" />
+
+    <h3>Webhooks</h3>
+    <p>Twilio Phonecalls Webhook: <span id="twilioPhonecallsWebhook"></span></p>
+    <p>Twilio Messaging Webhook: <span id="twilioMessagingWebhook"></span></p>
+    <p>Sendgrid Webhook: <span id="sendgridWebhook"></span></p>
+    <p>Browser-based STS: <span id="browserBasedSts"></span></p>
+
+    <script>
+
+        function updateWebhooks() {
+            const domain = document.getElementById('domain').value;
+            const agentUrl = document.getElementById('agentUrl').value;
+            const adminAuthToken = document.getElementById('adminAuthToken').value;
+            const deepgramToken = document.getElementById('deepgramToken').value;
+            const twilioAccountSid = document.getElementById('twilioAccountSid').value;
+            const twilioAuthToken = document.getElementById('twilioAuthToken').value;
+            const sendgridApiKey = document.getElementById('sendgridApiKey').value;
+
+            document.getElementById('twilioPhonecallsWebhook').textContent = `https://${domain}/sts/${adminAuthToken}/${deepgramToken}/${agentUrl}`;
+            document.getElementById('twilioMessagingWebhook').textContent = `https://${domain}/twilio?agentSlug=${agentUrl}&authToken=${adminAuthToken}&twilioAccountSid=${twilioAccountSid}&twilioAuthToken=${twilioAuthToken}`;
+            document.getElementById('sendgridWebhook').textContent = `https://${domain}/sendgrid?agentSlug=${agentUrl}&authToken=${adminAuthToken}&sendgridApiKey=${sendgridApiKey}`;
+            document.getElementById('browserBasedSts').textContent = `https://${domain}/?agentUrl=${agentUrl}&adminAuthToken=${adminAuthToken}&deepgramToken=${deepgramToken}`;
+        }
+    </script>
+</body>
+
+</html>

@@ -12,7 +12,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "serve": "ngrok http http://localhost:8787"
+    "serve": "cloudflared tunnel run dev",
+    "info": "cloudflared tunnel info dev"
   },
   "dependencies": {
     "html-to-md": "^0.8.5",

@@ -4,15 +4,9 @@ import {
   getFormContextFromOpenapi,
   getOperationRequestInit,
 } from "openapi-util";
+import { AssistantType } from "./types";
 
 const agentWsUrl = "wss://sts.sandbox.deepgram.com/agent";
-
-type AssistantType = {
-  instructions: string;
-  openapiUrl?: string;
-  /** @description Used to authenticate to the OpenAPI to use tools */
-  openapiAuthToken?: string;
-};
 
 export const handleSts = async (request: Request) => {
   const url = new URL(request.url);
