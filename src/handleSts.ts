@@ -1,7 +1,5 @@
 import { getOperations } from "openapi-util/build/node/getOperations";
-import { resolveSchemaRecursive } from "openapi-util/build/resolveSchemaRecursive";
 import {
-  OpenapiDocument,
   fetchOpenapi,
   getFormContextFromOpenapi,
   getOperationRequestInit,

@@ -1,4 +1,5 @@
 import { handleSts } from "./handleSts";
+import { handleStsClient } from "./handleStsClient";
 import { handleTwilioMessage } from "./handleTwilioMessage";
 import { handleSendgridMessage } from "./sendgrid/handleSendgridMessage";
 
@@ -24,5 +25,5 @@ async function handleRequest(request: Request) {
     return handleSts(request);
   }
 
-  return new Response("Not found", { status: 404 });
+  return handleStsClient(request);
 }
