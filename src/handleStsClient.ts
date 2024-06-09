@@ -58,9 +58,9 @@ export const handleStsClient = async (request: Request) => {
             // NB: as this can be based on the data (and parameters) we might have a problem with some openapis
             url,
             parameters: item.resolvedRequestBodySchema,
-
+            method: "post",
             // Bearer token for provided api endpoint so we can auth to your function
-            key: `Bearer ${assistant.openapiAuthToken}`,
+            key: `${assistant.openapiAuthToken}`,
           };
         })
       : undefined;
@@ -242,8 +242,8 @@ export const handleStsClient = async (request: Request) => {
                 think: {
                   provider: providerAndModel[0],
                   model: providerAndModel[1],
-                  instructions: "${assistant.instructions}",
-                  functions: ${JSON.stringify(functions)}
+                  instructions: "${assistant.instructions}"
+                 // functions: ${JSON.stringify(functions)}
                 },
                 speak: {
                   model: voice
