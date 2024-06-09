@@ -8,7 +8,21 @@
 
     <script>
         window.onload = function () {
+
+
             document.getElementById('domain').value = window.location.hostname;
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const adminAuthToken = urlParams.get('adminAuthToken');
+            const agentUrl = urlParams.get('agentUrl');
+
+            if (adminAuthToken) {
+                document.getElementById('adminAuthToken').value = adminAuthToken;
+            }
+            if (agentUrl) {
+                document.getElementById('agentUrl').value = agentUrl;
+            }
+
         };
     </script>
 </head>
