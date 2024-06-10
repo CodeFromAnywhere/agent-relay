@@ -1,10 +1,18 @@
 # Agent Relay
 
-Agent Relay can make an agent made via [ActionSchema Agents](https://agent.actionschema.com) available everywhere.
+Agents need to be accessible from anywhere. The Agent Relay makes agents accessible from messaging apps, VoIP and phonecalls, and over email!
+
+![](agent-relay.drawio.png)
+
+Agents need to be able to have long interval back-and-forth with humans. The Human OpenAPI makes this possible.
+
+![](human-openapi.drawio.png)
 
 # Usage
 
-Calculate your webhooks [here](https://agent-relay.actionschema.workers.dev)
+1. Make your agent available as API [here](https://agent.actionschema.com)
+2. Calculate your webhooks [here](https://agent-relay.actionschema.workers.dev)
+3. Add the webhooks to your telecom channels of your choice
 
 # Twilio STS Agent
 
