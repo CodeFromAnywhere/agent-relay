@@ -252,7 +252,7 @@ export const handleStsClient = async (request: Request) => {
                   provider: providerAndModel[0],
                   model: providerAndModel[1],
                   instructions: "${assistant.instructions}"
-                 // functions: ${JSON.stringify(functions)}
+                  //functions: ${JSON.stringify(functions)}
                 },
                 speak: {
                   model: voice

@@ -1,0 +1,136 @@
+{
+  "x-actionschema": "0.0.1",
+  "$schema": "https://raw.githubusercontent.com/CodeFromAnywhere/ActionSchema/main/schemas/openapi.schema.json",
+  "$source": "This ref can't be resolved it seems. Why not? https://data.actionschema.com/openapi.json#/paths/test",
+  "info": {
+    "title": "Open Human",
+    "description": "",
+    "version": "0.0.1"
+  },
+  "servers": [{ "url": "https://human.actionschema.com" }],
+  "components": {
+    "schemas": {
+      "EnvironmentVariables": {
+        "type": "object",
+        "description": "Should be present as host.",
+        "properties": {
+          "twilioSid": { "type": "string" },
+          "twilioAuthToken": { "type": "string" },
+          "upstashEmail": { "type": "string" },
+          "upstashApiKey": { "type": "string" },
+          "sendgridApiKey": { "type": "string" }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Auth that maps to your api credentials"
+      }
+    }
+  },
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/{slug}": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "slug",
+          "description": "The slug of the human.",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "post": {
+        "description": "Post a human profile",
+        "responses": {}
+      },
+      "get": {
+        "description": "Profile of a human",
+        "responses": {
+          "200": {
+            "description": "Exists",
+            "content": {
+              "application/json": { "schema": {} },
+              "text/html": {}
+            }
+          }
+        }
+      }
+    },
+    "/{slug}/openapi.json": {
+      "parameters": [
+        {
+          "in": "path",
+          "name": "slug",
+          "description": "The slug of the human.",
+          "required": true,
+          "schema": { "type": "string" }
+        }
+      ],
+      "get": {
+        "description": "OpenAPI of a Human",
+        "responses": {
+          "200": {
+            "description": "Exists",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "https://raw.githubusercontent.com/CodeFromAnywhere/ActionSchema/main/schemas/openapi.schema.json#"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "/email": {
+      "post": {
+        "description": "Send an email",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "to": { "type": "string" },
+                  "fromEmail": { "type": "string" },
+                  "title": { "type": "string" },
+                  "text": { "type": "string" },
+                  "html": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": { "application/json": { "schema": {} } },
+            "description": "Standard response"
+          }
+        }
+      },
+      "parameters": [
+        {
+          "schema": { "type": "string" },
+          "in": "header",
+          "name": "sendgridApiKey"
+        }
+      ]
+    },
+
+    "/call": { "$ref": "vapi call?", "x-proxy": { "enabled": true } },
+    "/twilio-message": {
+      "description": "Whatsapp, SMS, Messenger, and any other"
+    },
+    "/twilio-phonecall-webhook": {},
+    "/twilio-message-webhook": {},
+    "/sendgrid-webhook": {}
+  }
+}

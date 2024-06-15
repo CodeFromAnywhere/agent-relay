@@ -34,3 +34,7 @@ wrangler deploy
 ```
 
 Take the resulting `*.workers.dev` URL as base url, and add the required path to get your webhooks.
+
+# More info
+
+[More info here](more-info.md) (currently in conceptual phase)

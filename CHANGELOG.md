@@ -71,6 +71,20 @@ Fix these node compatibility issues of cloudflare
 
 ✅ Do the same for all other things Twilio serves, basically creating a Twilio+GPT Link.
 
+# HTML STS Client
+
+✅ `index.ts:99` --> Fix JSONParseError
+
+✅ Setup Local Tunnel in `npm run dev`: https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/get-started/create-local-tunnel/ <-- NEEDS A FIXED URL TO PUT IN A PHONE NUMBER
+
+✅ Get a Whatsapp Phone Number and talk to Wijnand AI that is in dev...
+
+✅ https://developers.deepgram.com/reference/js-example-client
+
+✅ The websocket is now made available through a URL in twilio containing all info - without there being a datastore. However, it can be great for PR if we allow people to find agents and either chat with them (via opengpts) or speak (via html client).
+
+✅ Render a button on the agent that opens the browser client for talking to it through websocket (requires user to fill a deepgram token)
+
 # Self Control
 
 Adding tools to call someone or to hang up the call are super cool for twilio calls. Let's try this out!
