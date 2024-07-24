@@ -1,3 +1,3 @@
 export const POST = () => {
-  return new Response("Hello world");
+  return new Response("Hello, world!");
 };
