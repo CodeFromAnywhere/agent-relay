@@ -37,16 +37,16 @@
   ],
   "paths": {
     "/{slug}": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "slug",
-          "description": "The slug of the human.",
-          "required": true,
-          "schema": { "type": "string" }
-        }
-      ],
       "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "description": "The slug of the human.",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
         "description": "Post a human profile",
         "responses": {}
       },
@@ -64,17 +64,17 @@
       }
     },
     "/{slug}/openapi.json": {
-      "parameters": [
-        {
-          "in": "path",
-          "name": "slug",
-          "description": "The slug of the human.",
-          "required": true,
-          "schema": { "type": "string" }
-        }
-      ],
       "get": {
         "description": "OpenAPI of a Human",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "description": "The slug of the human.",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
         "responses": {
           "200": {
             "description": "Exists",
@@ -93,6 +93,13 @@
     "/email": {
       "post": {
         "description": "Send an email",
+        "parameters": [
+          {
+            "schema": { "type": "string" },
+            "in": "header",
+            "name": "sendgridApiKey"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -115,14 +122,7 @@
             "description": "Standard response"
           }
         }
-      },
-      "parameters": [
-        {
-          "schema": { "type": "string" },
-          "in": "header",
-          "name": "sendgridApiKey"
-        }
-      ]
+      }
     },
 
     "/call": { "$ref": "vapi call?", "x-proxy": { "enabled": true } },

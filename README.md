@@ -2,7 +2,7 @@
 
 Agents need to be accessible from anywhere. The Agent Relay makes agents accessible from messaging apps, VoIP and phonecalls, and over email!
 
-![](agent-relay.drawio.png)
+![](public/agent-relay.drawio.png)
 
 Agents need to be able to have long interval back-and-forth with humans. The Human OpenAPI makes this possible.
 

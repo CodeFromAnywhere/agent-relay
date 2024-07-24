@@ -6,9 +6,11 @@ Open Human facilitates programmatic access to human beings. It does so by creati
 
 Currently there are two ideas: The idea for 'Human Expo' and the idea for a 'Twilio Relay'. Human expo can be done without Twilio relay and vice versa. In the long run it's probably better to split up these two concepts.
 
-# Human Expo
+# Document DB
 
-**Human Expo** Makes it easy to expose (and find) information about humans.
+![](document-db.drawio.png)
+
+**Document DB** Makes it easy to expose (and find) information about people, projects, and/or companies.
 
 - Ability to expose relevant information for humans in a specific area
 - Ability to make these humans discoverable with search.
