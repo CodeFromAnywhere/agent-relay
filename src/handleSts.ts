@@ -1,7 +1,6 @@
-import { getOperations } from "openapi-util/build/node/getOperations";
 import {
   fetchOpenapi,
-  getFormContextFromOpenapi,
+  getOperations,
   getOperationRequestInit,
 } from "openapi-util";
 import { AssistantType } from "./types";
@@ -84,29 +83,9 @@ export const handleSts = async (request: Request) => {
 
   const functions =
     openapi && operations
-      ? operations.map((item) => {
-          const { method, path } = item;
-
-          const formContext = getFormContextFromOpenapi({
-            //@ts-ignore
-            method,
-            path,
-            openapi,
-          });
-          const { parameters, schema, securitySchemes, servers } = formContext;
-
-          const { fetchRequestInit, url } = getOperationRequestInit({
-            path,
-            method,
-            //@ts-ignore
-            servers,
-            data: {},
-            parameters,
-            securitySchemes,
-          });
-
+      ? operations.map(async (item) => {
           return {
-            name: item.id, // e.g. get_weather
+            name: item.operationId, // e.g. get_weather
             description: item.operation.description || item.operation.summary,
 
             // url string, the API endpoint where your function exists

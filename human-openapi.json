@@ -1,6 +1,6 @@
 {
   "x-actionschema": "0.0.1",
-  "$schema": "https://raw.githubusercontent.com/CodeFromAnywhere/ActionSchema/main/schemas/openapi.schema.json",
+  "$schema": "https://spec.actionschema.com/openapi.json",
   "$source": "This ref can't be resolved it seems. Why not? https://data.actionschema.com/openapi.json#/paths/test",
   "info": {
     "title": "Open Human",
@@ -81,7 +81,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "https://raw.githubusercontent.com/CodeFromAnywhere/ActionSchema/main/schemas/openapi.schema.json#"
+                  "$ref": "https://spec.actionschema.com/openapi.json#"
                 }
               }
             }

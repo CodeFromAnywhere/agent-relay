@@ -1,10 +1,9 @@
 import {
   fetchOpenapi,
-  getFormContextFromOpenapi,
   getOperationRequestInit,
+  getOperations,
 } from "openapi-util";
 import { AssistantType } from "./types";
-import { getOperations } from "openapi-util/build/node/getOperations";
 
 export const handleStsClient = async (request: Request) => {
   const url = new URL(request.url);
@@ -33,45 +32,41 @@ export const handleStsClient = async (request: Request) => {
       Authorization: `Bearer ${adminAuthToken}`,
     },
   }).then((res) => res.json() as Promise<AssistantType>);
+
+  if (!assistant || !assistant.openapiUrl) {
+    return new Response("No openapi URL", { status: 404 });
+  }
   const openapi = await fetchOpenapi(assistant.openapiUrl);
   const operations = openapi ? await getOperations(openapi) : undefined;
 
   const functions =
     openapi && operations
-      ? operations.map((item) => {
-          const { method, path } = item;
+      ? await Promise.all(
+          operations.map(async (item) => {
+            const {} = item;
 
-          const formContext = getFormContextFromOpenapi({
-            //@ts-ignore
-            method,
-            path,
-            openapi,
-          });
-          const { parameters, schema, securitySchemes, servers } = formContext;
+            const requestInit = await getOperationRequestInit({
+              openapiUrl: assistant.openapiUrl!,
+              openapi,
+              operationId: item.operationId,
+              data: {},
+              access_token: undefined,
+            });
 
-          const { fetchRequestInit, url } = getOperationRequestInit({
-            path,
-            method,
-            //@ts-ignore
-            servers,
-            data: {},
-            parameters,
-            securitySchemes,
-          });
+            return {
+              name: item.operationId, // e.g. get_weather
+              description: item.operation.description || item.operation.summary,
 
-          return {
-            name: item.id, // e.g. get_weather
-            description: item.operation.description || item.operation.summary,
-
-            // url string, the API endpoint where your function exists
-            // NB: as this can be based on the data (and parameters) we might have a problem with some openapis
-            url,
-            parameters: item.resolvedRequestBodySchema,
-            method: "post",
-            // Bearer token for provided api endpoint so we can auth to your function
-            key: `${assistant.openapiAuthToken}`,
-          };
-        })
+              // url string, the API endpoint where your function exists
+              // NB: as this can be based on the data (and parameters) we might have a problem with some openapis
+              url,
+              parameters: item.mergedInputSchema,
+              method: "post",
+              // Bearer token for provided api endpoint so we can auth to your function
+              key: `${assistant.openapiAuthToken}`,
+            };
+          }),
+        )
       : undefined;
 
   console.log({ functions });
